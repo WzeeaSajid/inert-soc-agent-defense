@@ -1,5 +1,6 @@
 # INERT
 
+
 **Injection-Neutralizing Field Ablation for LLM-Driven SOC Triage**
 
 INERT is a deterministic pre-processing layer that protects autonomous, LLM-based Security Operations Center (SOC) agents from **log-borne indirect prompt injection**. It parses each log event, separates the trusted structure from attacker-controlled fields, and ablates those fields *before* the LLM ever sees them.
