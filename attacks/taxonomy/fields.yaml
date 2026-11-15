@@ -1,0 +1,35 @@
+# High-risk field taxonomy: which fields are trusted schema vs attacker-controlled.
+# Consumed by Abeer's parsers (to split events) and by Fatima's injector
+# (to choose where payloads go). Edit here, not in code.
+version: 0.1
+sources:
+  ssh:
+    trusted: [timestamp, host, process, pid, src_ip, src_port, event_type]
+    untrusted:
+      - name: username
+        risk: high
+        reason: Sent by the client during authentication; logged verbatim.
+  web:
+    trusted: [timestamp, client_ip, method, http_version, status, bytes]
+    untrusted:
+      - name: http_user_agent
+        risk: high
+        reason: Arbitrary client-set header, logged verbatim.
+      - name: uri_query
+        risk: medium
+        reason: Client-controlled parameters in the request URI.
+      - name: referer
+        risk: medium
+        reason: Arbitrary client-set header.
+  windows_event:
+    trusted: [timestamp, event_id, computer, channel, user_sid]
+    untrusted:
+      - name: CommandLine
+        risk: high
+        reason: Process arguments are fully attacker-chosen.
+  dns:
+    trusted: [timestamp, client_ip, qtype, rcode]
+    untrusted:
+      - name: qname
+        risk: medium
+        reason: Attacker-chosen hostname; constrained to 253 chars, 63 per label.
