@@ -1,7 +1,7 @@
 # High-risk field taxonomy: which fields are trusted schema vs attacker-controlled.
 # Consumed by Abeer's parsers (to split events) and by Fatima's injector
 # (to choose where payloads go). Edit here, not in code.
-version: 0.1
+version: 0.2
 sources:
   ssh:
     trusted: [timestamp, host, process, pid, src_ip, src_port, event_type]
@@ -22,11 +22,16 @@ sources:
         risk: medium
         reason: Arbitrary client-set header.
   windows_event:
-    trusted: [timestamp, event_id, computer, channel, user_sid]
+    # Sysmon Event ID 1 (process creation). Image/ParentImage are treated as
+    # trusted in v0.1 although executable names can be attacker-chosen: known limitation.
+    trusted: [timestamp, event_id, channel, computer, user, process_id, image, parent_image, event_type]
     untrusted:
       - name: CommandLine
         risk: high
         reason: Process arguments are fully attacker-chosen.
+      - name: ParentCommandLine
+        risk: high
+        reason: Same as CommandLine, for the parent process.
   dns:
     trusted: [timestamp, client_ip, qtype, rcode]
     untrusted:
